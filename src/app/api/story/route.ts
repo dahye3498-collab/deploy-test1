@@ -1,16 +1,26 @@
 import { OpenAI } from 'openai';
 import { NextResponse } from 'next/server';
 
+export async function GET() {
+    return NextResponse.json({ message: '전생 API 서버가 정상적으로 작동 중입니다.', status: 'ready' });
+}
+
 export async function POST(req: Request) {
     try {
         const apiKey = process.env.OPENAI_API_KEY;
-        if (!apiKey) {
-            console.error('Missing OPENAI_API_KEY');
-            return NextResponse.json({ error: 'API 키가 설정되지 않았습니다. Vercel 설정에서 OPENAI_API_KEY를 확인해주세요.' }, { status: 500 });
+        if (!apiKey || apiKey.trim() === '') {
+            console.error('Environment variable OPENAI_API_KEY is missing or empty');
+            return NextResponse.json({
+                error: 'OpenAI API 키가 설정되지 않았습니다. Vercel 설정(Settings > Environment Variables)에서 OPENAI_API_KEY를 추가하고 다시 배포(Redeploy)해 주세요.'
+            }, { status: 500 });
         }
 
-        const openai = new OpenAI({ apiKey });
+        const openai = new OpenAI({ apiKey: apiKey.trim() });
         const { name, title, year } = await req.json();
+
+        if (!name || !title) {
+            return NextResponse.json({ error: '필수 데이터가 누락되었습니다.' }, { status: 400 });
+        }
 
         const prompt = `
 당신은 전생의 모든 고리(Karma)를 꿰뚫어 보는 신비롭지만 약간은 '병맛' 기질이 있는 예언자입니다. 
