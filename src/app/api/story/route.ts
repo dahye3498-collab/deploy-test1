@@ -1,12 +1,15 @@
 import { OpenAI } from 'openai';
 import { NextResponse } from 'next/server';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(req: Request) {
     try {
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) {
+            console.error('Missing OPENAI_API_KEY');
+            return NextResponse.json({ error: 'API 키가 설정되지 않았습니다. Vercel 설정에서 OPENAI_API_KEY를 확인해주세요.' }, { status: 500 });
+        }
+
+        const openai = new OpenAI({ apiKey });
         const { name, title, year } = await req.json();
 
         const prompt = `
