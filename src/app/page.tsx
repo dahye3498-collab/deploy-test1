@@ -27,10 +27,13 @@ export default function PastLifePage() {
             });
 
             const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || '전생의 기억을 불러오는 데 실패했습니다.');
+            }
             setResult({ ...pastLife, story: data.story });
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('전생의 기억을 불러오는 중 오류가 발생했습니다.');
+            alert(error.message || '전생의 기억을 불러오는 중 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
         }
@@ -86,11 +89,11 @@ export default function PastLifePage() {
                             </div>
 
                             <div className="story">
-                                {result.story.split('\n').map((line, i) => (
+                                {result.story ? result.story.split('\n').map((line, i) => (
                                     <p key={i} style={{ marginBottom: i < result.story.split('\n').length - 1 ? '1rem' : 0 }}>
                                         {line}
                                     </p>
-                                ))}
+                                )) : <p>이야기를 불러올 수 없습니다.</p>}
                             </div>
 
                             <motion.button
