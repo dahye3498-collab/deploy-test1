@@ -113,6 +113,7 @@ export default function PastLifePage() {
 
             <footer style={{ marginTop: '3rem', opacity: 0.4, fontSize: '0.8rem' }}>
                 &copy; 2026 Past Life Chronicler. All memories reserved.
+                <div style={{ marginTop: '0.5rem', fontSize: '0.6rem' }}>v1.0.2 - 최종 점검 완료</div>
             </footer>
         </main>
     );
