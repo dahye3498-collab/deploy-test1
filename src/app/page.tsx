@@ -26,14 +26,25 @@ export default function PastLifePage() {
                 body: JSON.stringify({ name, ...pastLife }),
             });
 
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || '전생의 기억을 불러오는 데 실패했습니다.');
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
             }
+
+            if (!response.ok) {
+                const errorMessage = data?.error || `서버 오류가 발생했습니다. (상태 코드: ${response.status})`;
+                throw new Error(errorMessage);
+            }
+
+            if (!data || !data.story) {
+                throw new Error('전생의 이야기를 가져오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+            }
+
             setResult({ ...pastLife, story: data.story });
         } catch (error: any) {
-            console.error(error);
-            alert(error.message || '전생의 기억을 불러오는 중 오류가 발생했습니다.');
+            console.error('Frontend Error:', error);
+            alert(`[알림] ${error.message}`);
         } finally {
             setIsLoading(false);
         }
@@ -113,7 +124,7 @@ export default function PastLifePage() {
 
             <footer style={{ marginTop: '3rem', opacity: 0.4, fontSize: '0.8rem' }}>
                 &copy; 2026 Past Life Chronicler. All memories reserved.
-                <div style={{ marginTop: '0.5rem', fontSize: '0.6rem' }}>v1.0.2 - 최종 점검 완료</div>
+                <div style={{ marginTop: '0.5rem', fontSize: '0.6rem' }}>v1.0.3 - 최종 응급 처치 완료</div>
             </footer>
         </main>
     );
